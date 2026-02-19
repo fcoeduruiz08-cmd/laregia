@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>La Regia GH Cocina</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --amarillo:#f4b400;
+  --negro:#0f0f0f;
+  --gris:#1a1a1a;
+  --verde:#25d366;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif;}
+body{
+  background:linear-gradient(180deg,#0f0f0f,#181818);
+  color:white;
+  overflow-x:hidden;
+  padding-top:80px;  /* 👈 AGREGAR ESTA LÍNEA */
+}
+/* NAV */
+nav{
+  position:fixed;
+  top:0;
+  width:100%;
+  height:80px;              /* 👈 IMPORTANTE */
+  background:rgba(0,0,0,0.8);
+  backdrop-filter:blur(10px);
+  padding:0 25px;           /* 👈 QUITA el padding vertical */
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  z-index:1000;
+}
+nav h2{color:var(--amarillo);font-weight:800;}
+nav a{color:white;text-decoration:none;margin-left:20px;transition:0.3s;}
+nav a:hover{color:var(--amarillo);}
+
+/* HERO */
+.hero{
+  height:90vh;
+  background:linear-gradient(rgba(0,0,0,0.6),rgba(0,0,0,0.9)),
+  url('IMAGEN-PORTADA.jpg') center/cover;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  text-align:center;
+  padding:20px;
+}
+.hero h1{font-size:48px;color:var(--amarillo);}
+.hero p{margin:20px 0;font-size:18px;opacity:0.9;}
+.hero button{
+  background:var(--amarillo);
+  border:none;
+  padding:12px 25px;
+  border-radius:30px;
+  font-weight:600;
+  cursor:pointer;
+}
+
+/* SECCIONES */
+section{padding:100px 20px;max-width:1200px;margin:auto;}
+.titulo{text-align:center;color:var(--amarillo);margin-bottom:50px;font-size:32px;}
+
+/* CARDS */
+.menu-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:30px;
+}
+.card{
+  background:rgba(255,255,255,0.05);
+  backdrop-filter:blur(8px);
+  border-radius:20px;
+  overflow:hidden;
+  transition:0.4s;
+}
+.card:hover{transform:translateY(-10px);}
+.card img{
+  width:100%;
+  height:200px;
+  object-fit:cover;
+}
+.card-content{padding:20px;}
+.precio{color:var(--amarillo);font-weight:bold;margin:10px 0;}
+.add-btn{
+  background:var(--amarillo);
+  border:none;
+  padding:8px 18px;
+  border-radius:25px;
+  cursor:pointer;
+}
+
+/* ADMIN PANEL */
+.admin-panel{
+  margin-top:40px;
+  background:#111;
+  padding:20px;
+  border-radius:15px;
+}
+.admin-panel input{
+  padding:8px;
+  margin:5px;
+  border-radius:5px;
+  border:none;
+}
+.admin-panel button{
+  padding:8px 12px;
+  border:none;
+  border-radius:5px;
+  background:var(--amarillo);
+  cursor:pointer;
+}
+
+/* CARRITO */
+.cart{
+  position:fixed;
+  top:0;
+  right:-100%;
+  width:350px;
+  height:100%;
+  background:#111;
+  padding:25px;
+  transition:0.4s;
+  overflow-y:auto;
+}
+.cart.active{right:0;}
+.cart-toggle{
+  position:fixed;
+  bottom:20px;
+  right:20px;
+  background:var(--amarillo);
+  padding:15px;
+  border-radius:50%;
+  cursor:pointer;
+}
+
+/* MAPA */
+iframe{width:100%;height:350px;border:none;border-radius:20px;margin-top:20px;}
+section{
+  scroll-margin-top:100px;
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <h2>La Regia GH Cocina</h2>
+  <div>
+    <a href="#menu">Menú</a>
+    <a href="#ubicacion">Ubicación</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <h1>Sabor Regio en Cada Bocado 🔥</h1>
+  <p>Comida casera con auténtico sabor del norte.</p>
+  <button onclick="document.getElementById('menu').scrollIntoView()">Ver Menú</button>
+</div>
+
+<section id="menu">
+  <h2 class="titulo">Nuestro Menú</h2>
+  <div class="menu-grid" id="menu-container"></div>
+
+  <div class="admin-panel">
+    <h3>Panel Administrador (Solo para el dueño)</h3>
+    <input type="text" id="nuevoNombre" placeholder="Nombre producto">
+    <input type="number" id="nuevoPrecio" placeholder="Precio">
+    <input type="text" id="nuevaImagen" placeholder="Nombre imagen (ej: taco.jpg)">
+    <button onclick="agregarProducto()">Agregar Producto</button>
+  </div>
+</section>
+
+<section id="ubicacion">
+  <h2 class="titulo">Ubicación</h2>
+  <iframe src="https://www.google.com/maps?q=Calle+Aguascalientes+100+Col+Celestino+Gasca&output=embed"></iframe>
+</section>
+
+<div class="cart" id="cart">
+  <h3>Tu Pedido</h3>
+  <div id="cart-items"></div>
+  <div id="total"></div>
+  <button onclick="checkout()">Enviar por WhatsApp</button>
+</div>
+
+<div class="cart-toggle" onclick="toggleCart()">🛒</div>
+
+<script>
+let productos=[
+  {nombre:"Asado de Puerco",precio:90,imagen:"asado.jpg"},
+  {nombre:"Hamburguesa Clásica",precio:90,imagen:"hamburguesa.jpg"},
+  {nombre:"Tacos Pirata",precio:100,imagen:"tacos.jpg"},
+
+  {nombre:"Discada Norteña",precio:95,imagen:"discada.jpg"},
+  {nombre:"Milanesa Empanizada",precio:100,imagen:"milanesa.jpg"},
+  {nombre:"Pechuga a la Plancha",precio:100,imagen:"pechuga.jpg"},
+  {nombre:"Hamburguesa Doble Carne",precio:120,imagen:"doble.jpg"},
+  {nombre:"Club Sandwich",precio:90,imagen:"club.jpg"},
+  {nombre:"Ensalada de Pollo",precio:80,imagen:"ensalada.jpg"},
+  {nombre:"Papas a la Francesa",precio:60,imagen:"papas.jpg"}
+];
+function renderMenu(){
+  const container=document.getElementById("menu-container");
+  container.innerHTML="";
+  productos.forEach((p,i)=>{
+    container.innerHTML+=`
+    <div class="card">
+      <img src="${p.imagen}" alt="${p.nombre}">
+      <div class="card-content">
+        <h3>${p.nombre}</h3>
+        <div class="precio">$${p.precio}</div>
+        <button class="add-btn" onclick="addToCart(${i})">Agregar</button>
+        <button onclick="eliminarProducto(${i})" style="background:red;color:white;border:none;padding:5px 10px;border-radius:5px;margin-left:10px;">Eliminar</button>
+      </div>
+    </div>`;
+  });
+}
+
+function agregarProducto(){
+  const nombre=document.getElementById("nuevoNombre").value;
+  const precio=parseInt(document.getElementById("nuevoPrecio").value);
+  const imagen=document.getElementById("nuevaImagen").value;
+  if(nombre && precio && imagen){
+    productos.push({nombre,precio,imagen});
+    renderMenu();
+  }
+}
+
+function eliminarProducto(index){
+  productos.splice(index,1);
+  renderMenu();
+}
+
+let carrito=[];
+
+function addToCart(index){
+  const producto=productos[index];
+  const existente=carrito.find(item=>item.nombre===producto.nombre);
+  if(existente){existente.cantidad++;}
+  else{carrito.push({...producto,cantidad:1});}
+  renderCart();
+}
+
+function renderCart(){
+  const items=document.getElementById("cart-items");
+  const totalEl=document.getElementById("total");
+  items.innerHTML="";
+  let total=0;
+  carrito.forEach((item,i)=>{
+    total+=item.precio*item.cantidad;
+    items.innerHTML+=`
+    <div>
+      ${item.nombre} x${item.cantidad} - $${item.precio*item.cantidad}
+      <button onclick="carrito.splice(${i},1);renderCart()">Eliminar</button>
+    </div>`;
+  });
+  totalEl.innerHTML="<strong>Total: $"+total+"</strong>";
+}
+
+function toggleCart(){
+  document.getElementById("cart").classList.toggle("active");
+}
+
+function checkout(){
+  let mensaje="Hola quiero pedir:%0A";
+  carrito.forEach(item=>{
+    mensaje+=`${item.nombre} x${item.cantidad} - $${item.precio*item.cantidad}%0A`;
+  });
+  window.open("https://wa.me/528149935887?text="+mensaje);
+}
+
+renderMenu();
+</script>
+
+</body>
+</html>
