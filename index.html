@@ -44,7 +44,7 @@ nav a:hover{color:var(--amarillo);}
 .hero{
   height:90vh;
   background:linear-gradient(rgba(0,0,0,0.6),rgba(0,0,0,0.9)),
-  url('IMAGEN-PORTADA.jpg') center/cover;
+  url('fondo.jpeg') center/cover;
   display:flex;
   flex-direction:column;
   justify-content:center;
@@ -120,10 +120,10 @@ section{padding:100px 20px;max-width:1200px;margin:auto;}
 /* CARRITO */
 .cart{
   position:fixed;
-  top:0;
+  top:80px;                  /* 👈 BAJAMOS EL CARRITO */
   right:-100%;
   width:350px;
-  height:100%;
+  height:calc(100% - 80px);  /* 👈 AJUSTAMOS ALTURA */
   background:#111;
   padding:25px;
   transition:0.4s;
@@ -139,7 +139,25 @@ section{padding:100px 20px;max-width:1200px;margin:auto;}
   border-radius:50%;
   cursor:pointer;
 }
+.checkout-btn{
+  width:100%;
+  margin-top:20px;
+  padding:15px;
+  border:none;
+  border-radius:12px;
+  background:linear-gradient(45deg,#25d366,#1ebe5d);
+  color:white;
+  font-size:16px;
+  font-weight:600;
+  cursor:pointer;
+  transition:0.3s;
+  box-shadow:0 5px 15px rgba(37,211,102,0.4);
+}
 
+.checkout-btn:hover{
+  transform:translateY(-3px);
+  box-shadow:0 8px 20px rgba(37,211,102,0.6);
+}
 /* MAPA */
 iframe{width:100%;height:350px;border:none;border-radius:20px;margin-top:20px;}
 section{
@@ -167,13 +185,7 @@ section{
   <h2 class="titulo">Nuestro Menú</h2>
   <div class="menu-grid" id="menu-container"></div>
 
-  <div class="admin-panel">
-    <h3>Panel Administrador (Solo para el dueño)</h3>
-    <input type="text" id="nuevoNombre" placeholder="Nombre producto">
-    <input type="number" id="nuevoPrecio" placeholder="Precio">
-    <input type="text" id="nuevaImagen" placeholder="Nombre imagen (ej: taco.jpg)">
-    <button onclick="agregarProducto()">Agregar Producto</button>
-  </div>
+
 </section>
 
 <section id="ubicacion">
@@ -185,7 +197,9 @@ section{
   <h3>Tu Pedido</h3>
   <div id="cart-items"></div>
   <div id="total"></div>
-  <button onclick="checkout()">Enviar por WhatsApp</button>
+ <button class="checkout-btn" onclick="checkout()">
+  📲 Enviar pedido por WhatsApp
+</button>
 </div>
 
 <div class="cart-toggle" onclick="toggleCart()">🛒</div>
@@ -195,14 +209,32 @@ let productos=[
   {nombre:"Asado de Puerco",precio:90,imagen:"asado.jpg"},
   {nombre:"Hamburguesa Clásica",precio:90,imagen:"hamburguesa.jpg"},
   {nombre:"Tacos Pirata",precio:100,imagen:"tacos.jpg"},
-
   {nombre:"Discada Norteña",precio:95,imagen:"discada.jpg"},
   {nombre:"Milanesa Empanizada",precio:100,imagen:"milanesa.jpg"},
   {nombre:"Pechuga a la Plancha",precio:100,imagen:"pechuga.jpg"},
   {nombre:"Hamburguesa Doble Carne",precio:120,imagen:"doble.jpg"},
   {nombre:"Club Sandwich",precio:90,imagen:"club.jpg"},
   {nombre:"Ensalada de Pollo",precio:80,imagen:"ensalada.jpg"},
-  {nombre:"Papas a la Francesa",precio:60,imagen:"papas.jpg"}
+  {nombre:"Papas a la Francesa",precio:60,imagen:"papas.jpg"},
+
+  {nombre:"Tacos de Bistec",precio:95,imagen:"bistec.jpg"},
+  {nombre:"Tacos de Trompo",precio:95,imagen:"trompo.jpg"},
+  {nombre:"Gringa Especial",precio:110,imagen:"gringa.jpg"},
+  {nombre:"Burrito Norteño",precio:85,imagen:"burrito.jpg"},
+  {nombre:"Chilaquiles Rojos",precio:85,imagen:"chilaquiles.jpg"},
+  {nombre:"Chilaquiles Verdes",precio:85,imagen:"chilaquiles-verdes.jpg"},
+  {nombre:"Huevos Rancheros",precio:80,imagen:"huevos.jpg"},
+  {nombre:"Molletes con Carne",precio:90,imagen:"molletes.jpg"},
+  {nombre:"Hot Dogs Regios",precio:70,imagen:"hotdog.jpg"},
+  {nombre:"Alitas BBQ",precio:120,imagen:"alitas.jpg"},
+  {nombre:"Boneless",precio:120,imagen:"boneless.jpg"},
+  {nombre:"Costillas BBQ",precio:150,imagen:"costillas.jpg"},
+  {nombre:"Carne Asada Plato",precio:140,imagen:"carneasada.jpg"},
+  {nombre:"Nachos con Carne",precio:110,imagen:"nachos.jpg"},
+  {nombre:"Quesadilla Gigante",precio:90,imagen:"quesadilla.jpg"},
+  {nombre:"Torta de Asado",precio:85,imagen:"torta.jpg"},
+  {nombre:"Refresco 600ml",precio:25,imagen:"refresco.jpg"},
+  {nombre:"Agua Natural",precio:20,imagen:"agua.jpg"}
 ];
 function renderMenu(){
   const container=document.getElementById("menu-container");
@@ -215,7 +247,7 @@ function renderMenu(){
         <h3>${p.nombre}</h3>
         <div class="precio">$${p.precio}</div>
         <button class="add-btn" onclick="addToCart(${i})">Agregar</button>
-        <button onclick="eliminarProducto(${i})" style="background:red;color:white;border:none;padding:5px 10px;border-radius:5px;margin-left:10px;">Eliminar</button>
+        
       </div>
     </div>`;
   });
