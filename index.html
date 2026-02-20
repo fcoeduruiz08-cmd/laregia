@@ -197,6 +197,29 @@ section{
   <h3>Tu Pedido</h3>
   <div id="cart-items"></div>
   <div id="total"></div>
+
+<hr style="margin:15px 0;border:1px solid #333;">
+
+<h4>Datos del Pedido</h4>
+
+<label>Nombre:</label>
+<input type="text" id="clienteNombre" placeholder="Tu nombre">
+
+<label>Tipo de pedido:</label>
+<select id="tipoEntrega">
+  <option value="Recoger en local">Recoger en local</option>
+  <option value="Envío a domicilio">Envío a domicilio</option>
+</select>
+<label id="direccionLabel" style="display:none;">Dirección:</label>
+<input type="text" id="direccionEnvio" placeholder="Tu dirección completa" style="display:none;">
+
+<label>Método de pago:</label>
+<select id="metodoPago">
+  <option value="Efectivo">Efectivo</option>
+  <option value="Tarjeta">Tarjeta</option>
+  <option value="Transferencia">Transferencia</option>
+</select>
+
  <button class="checkout-btn" onclick="checkout()">
   📲 Enviar pedido por WhatsApp
 </button>
@@ -299,12 +322,70 @@ function toggleCart(){
 }
 
 function checkout(){
-  let mensaje="Hola quiero pedir:%0A";
+
+  const nombre = document.getElementById("clienteNombre").value.trim();
+  const tipoEntrega = document.getElementById("tipoEntrega").value;
+  const metodoPago = document.getElementById("metodoPago").value;
+  const direccion = document.getElementById("direccionEnvio").value.trim();
+
+  if(nombre === ""){
+    alert("Por favor ingresa tu nombre");
+    return;
+  }
+
+  if(carrito.length === 0){
+    alert("Tu carrito está vacío");
+    return;
+  }
+
+  if(tipoEntrega === "Envío a domicilio" && direccion === ""){
+    alert("Por favor ingresa tu dirección de envío");
+    return;
+  }
+
+  let mensaje = "🛒 *NUEVO PEDIDO* %0A%0A";
+
+  mensaje += "👤 *Cliente:* " + nombre + "%0A";
+  mensaje += "🚚 *Entrega:* " + tipoEntrega + "%0A";
+  mensaje += "💳 *Pago:* " + metodoPago + "%0A";
+
+  if(tipoEntrega === "Envío a domicilio"){
+    mensaje += "📍 *Dirección:* " + direccion + "%0A";
+  }
+
+  mensaje += "%0A📦 *Productos:* %0A";
+
+  let total = 0;
+
   carrito.forEach(item=>{
-    mensaje+=`${item.nombre} x${item.cantidad} - $${item.precio*item.cantidad}%0A`;
+    const subtotal = item.precio * item.cantidad;
+    total += subtotal;
+
+    mensaje += "• " + item.nombre + 
+               " x" + item.cantidad + 
+               " - $" + subtotal + "%0A";
   });
-  window.open("https://wa.me/528149935887?text="+mensaje);
+
+  mensaje += "%0A💰 *TOTAL:* $" + total;
+
+  window.open("https://wa.me/528149935887?text=" + mensaje);
 }
+
+document.getElementById("tipoEntrega").addEventListener("change", function(){
+
+  const direccionInput = document.getElementById("direccionEnvio");
+  const direccionLabel = document.getElementById("direccionLabel");
+
+  if(this.value === "Envío a domicilio"){
+    direccionInput.style.display = "block";
+    direccionLabel.style.display = "block";
+  } else {
+    direccionInput.style.display = "none";
+    direccionLabel.style.display = "none";
+    direccionInput.value = "";
+  }
+
+});
 
 renderMenu();
 </script>
